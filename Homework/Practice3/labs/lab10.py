@@ -1,110 +1,148 @@
-import pandas
+def remove_same_rows_func_1(t, odds):
+    for el in odds:
+        while t.count(el) > 1:
+            t.pop(len(t) - t[::-1].index(el) - 1)
+
+
+def remove_same_rows_func_2(t, odds, i, j):
+    if j > i:
+        for k in range(len(t[i])):
+            if t[i][k] != t[j][k]:
+                break
+        else:
+            odds.append(t[i])
 
 
 def remove_same_rows(t):
-    t.drop_duplicates(inplace=True)
+    odds = []
+    for i in range(len(t)):
+        for j in range(len(t)):
+            remove_same_rows_func_2(t, odds, i, j)
+    remove_same_rows_func_1(t, odds)
+
+
+def remove_same_columns_func_1(t, odds):
+    for el in odds:
+        for i in range(len(t)):
+            while t[i].count(el) > 1:
+                t[i].remove(el)
+
+
+def remove_same_columns_func_2(t, odds, i, j):
+    for k in range(len(t)):
+        if j > i and t[k][j] != t[k][i]:
+            break
+    else:
+        for index in range(len(t)):
+            odds.append(t[index][j])
 
 
 def remove_same_columns(t):
-    odds = set()
-    for i in range(len(t.columns)):
-        for j in range(len(t.columns)):
-            if i < j and list(t[str(i + 1)]) == list(t[str(j + 1)]):
-                odds.add(str(j + 1))
-    t.drop(list(odds), axis=1, inplace=True)
+    odds = []
+    for i in range(len(t[0])):
+        for j in range(len(t[0])):
+            remove_same_columns_func_2(t, odds, i, j)
+    remove_same_columns_func_1(t, odds)
+
+
+def remove_blank_rows_func_1(t, odds):
+    for el in odds:
+        while el in t:
+            t.remove(el)
 
 
 def remove_blank_rows(t):
-    empty = []
-    for i in t.index:
-        for j in t.columns:
-            if t.at[i, j] is not None:
+    odds = []
+    for i in range(len(t)):
+        for j in range(len(t[i])):
+            if t[i][j] is not None:
                 break
         else:
-            empty.append(i)
-    t.drop(empty, axis=0, inplace=True)
+            odds.append(t[i])
+    remove_blank_rows_func_1(t, odds)
+
+
+def remove_blank_columns_1(t, odds):
+    for el in odds:
+        for i in range(len(t)):
+            while el in t[i]:
+                t[i].remove(el)
+
+
+def remove_blank_columns_2(t, odds, i):
+    for j in range(len(t)):
+        if t[j][i] is not None:
+            break
+    else:
+        for index in range(len(t)):
+            odds.append(t[index][i])
 
 
 def remove_blank_columns(t):
-    empty = []
-    for i in t.columns:
-        for j in t.index:
-            if t.at[j, i] is not None:
-                break
-        else:
-            empty.append(i)
-    t.drop(empty, axis=1, inplace=True)
+    odds = []
+    for i in range(len(t[0])):
+        remove_blank_columns_2(t, odds, i)
+    remove_blank_columns_1(t, odds)
 
 
 def change_table(t):
-    counter = 1
-    for c in t.columns:
-        t.rename(columns={c: str(counter)}, inplace=True)
-        counter += 1
+    for ti in t:
+        new_value_0 = "Не выполнено" if ti[0] == "нет" else "Выполнено"
+        ti[0] = new_value_0
 
-    counter = 0
-    for r in t.index:
-        t.rename(index={r: counter}, inplace=True)
-        counter += 1
+        new_value_1 = "(" + ti[1][3:6] + ") " + ti[1][7:13] + "-" + ti[1][13:]
+        ti[1] = new_value_1
 
-    c1 = list(t["1"].values)
-    for i in range(len(c1)):
-        new_value = "Не выполнено" if c1[i] == "нет" else "Выполнено"
-        t.at[i, "1"] = new_value
+        new_value_2 = ti[2][:6] + ti[2][8:]
+        ti[2] = new_value_2
 
-    c2 = list(t["2"].values)
-    for i in range(len(c2)):
-        new_value = c2[i].split()[-1]
-        t.at[i, "2"] = new_value
+        new_value_3 = ti[3].split()[-1]
+        ti[3] = new_value_3
 
-    c3 = list(t["3"].values)
-    for i in range(len(c3)):
-        new_value = "(" + c3[i][3:6] + ") " + c3[i][7:13] + "-" + c3[i][13:]
-        t.at[i, "3"] = new_value
-
-    c4 = list(t["4"].values)
-    for i in range(len(c4)):
-        new_value = c4[i][:6] + c4[i][8:]
-        t.at[i, "4"] = new_value
+        ti[1], ti[3] = ti[3], ti[1]
+        ti[2], ti[3] = ti[3], ti[2]
 
 
 def main(t):
-    remove_same_rows(t)
-    remove_same_columns(t)
     remove_blank_rows(t)
     remove_blank_columns(t)
+    remove_same_rows(t)
+    remove_same_columns(t)
     change_table(t)
+    return t
 
 
-t1 = pandas.DataFrame({
-    "1": ["нет", "да", None, "да", "да", None, "да", "да"],
-    "2": ["Марат А. Довотиди", "Амир М. Мигабин", None, "Амир М. Мигабин",
-          "Амир М. Мигабин", None, "Глеб В. Зомко", "Ян З. Тецовий"],
-    "3": ["+7 710 704-2158", "+7 739 369-3630", None, "+7 739 369-3630",
-          "+7 739 369-3630", None, "+7 845 775-1576", "+7 581 816-2307"],
-    "4": ["05/04/2003", "16/11/1999", None, "16/11/1999", "16/11/1999",
-          None, "28/12/2000", "06/10/2004"],
-    "5": [None, None, None, None, None, None, None, None],
-    "6": ["Марат А. Довотиди", "Амир М. Мигабин", None, "Амир М. Мигабин",
-          "Амир М. Мигабин", None, "Глеб В. Зомко", "Ян З. Тецовий"]
-                      })
-t2 = pandas.DataFrame({
-    "1": ["нет", "нет", "да", None, None, "нет", "нет"],
-    "2": ["Дмитрий Б. Цацибман", "Дмитрий Б. Цацибман", "Данила З. Локошак",
-          None, None, "Дмитрий Б. Цацибман", "Макар К. Дозозский"],
-    "3": ["+7 803 284-3073", "+7 803 284-3073", "+7 795 875-9730", None, None,
-          "+7 803 284-3073", "+7 984 587-0829"],
-    "4": ["19/02/1999", "19/02/1999", "01/10/2000", None, None, "19/02/1999",
-          "16/11/2004"],
-    "5": [None, None, None, None, None, None, None],
-    "6": ["Дмитрий Б. Цацибман", "Дмитрий Б. Цацибман", "Данила З. Локошак",
-          None, None, "Дмитрий Б. Цацибман", "Макар К. Дозозский"]
-})
+t1 = [
+    ['нет', 'Марат А. Довотиди', '+7 710 704-2158', '05/04/2003',
+     None, 'Марат А. Довотиди'],
+    ['да', 'Амир М. Мигабин', '+7 739 369-3630', '16/11/1999',
+     None, 'Амир М. Мигабин'],
+    [None, None, None, None, None, None],
+    ['да', 'Амир М. Мигабин', '+7 739 369-3630', '16/11/1999',
+     None, 'Амир М. Мигабин'],
+    ['да', 'Амир М. Мигабин', '+7 739 369-3630', '16/11/1999',
+     None, 'Амир М. Мигабин'],
+    [None, None, None, None, None, None],
+    ['да', 'Глеб В. Зомко', '+7 845 775-1576', '28/12/2000',
+     None, 'Глеб В. Зомко'],
+    ['да', 'Ян З. Тецовий', '+7 581 816-2307', '06/10/2004',
+     None, 'Ян З. Тецовий']]
+t2 = [
+    ['нет', 'Дмитрий Б. Цацибман', '+7 803 284-3073', '19/02/1999',
+     None, 'Дмитрий Б. Цацибман'],
+    ['нет', 'Дмитрий Б. Цацибман', '+7 803 284-3073', '19/02/1999',
+     None, 'Дмитрий Б. Цацибман'],
+    ['да', 'Данила З. Локошак', '+7 795 875-9730', '01/10/2000',
+     None, 'Данила З. Локошак'],
+    [None, None, None, None, None, None],
+    [None, None, None, None, None, None],
+    ['нет', 'Дмитрий Б. Цацибман', '+7 803 284-3073', '19/02/1999',
+     None, 'Дмитрий Б. Цацибман'],
+    ['нет', 'Макар К. Дозозский', '+7 984 587-0829', '16/11/2004',
+     None, 'Макар К. Дозозский']]
 
 main(t1)
-t1
 main(t2)
-t2
 
 print(t1)
 print(t2)
