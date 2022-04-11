@@ -16,42 +16,35 @@ class Vertex:
             for el in self.children:
                 el.dfs_print(length + 1)
 
-    def dfs_print_fancy(self, length=0, is_first=False):
-        if self.type == "dir":
-            if is_first:
-                print(("\t" * length) + "digraph " + self.name + " {")
-            else:
-                print(("\t" * length) + "subgraph " + self.name + " {")
-            files = []
-            for el in self.children:
-                if el.type == "file":
-                    files.append(el)
-                else:
-                    el.dfs_print_fancy(length + 1)
-            for i in range(len(files)):
-                if i == 0:
-                    print("\t" * (length + 1), end="")
-
-                print("\"" + files[i].name + "\"", end="")
-
-                if i != len(files) - 1:
-                    print(" -> ", end="")
-                else:
-                    print(";")
-            print("\t" * length + "}")
+    def dfs_print_fancy(self, length=0):
+        print(("\t" * (length + 1)) + "subgraph " + self.name + " {")
+        print(("\t" * (length + 2)) + "node [style=filled,color=grey" + "];")
+        for el in self.children:
+            print(("\t" * (length + 2)) + self.name + " -> \"" + el.name + "\"")
+            if el.type == "dir":
+                el.dfs_print_fancy(length + 1)
+        print(("\t" * (length + 1)) + "}")
 
 
 def scan_dir(dir, vertex):
     for name in os.listdir(dir):
-        path = os.path.join(dir, name)
-        if os.path.isfile(path):
-            vertex.children.append(Vertex(name, path, "file"))
-        else:
-            vertex.children.append(Vertex(name, path, "dir"))
-            scan_dir(path, vertex.children[-1])
+        if name != "__init__.py":
+            path = os.path.join(dir, name)
+            if os.path.isfile(path):
+                vertex.children.append(Vertex(name, path, "file"))
+            else:
+                vertex.children.append(Vertex(name, path, "dir"))
+                scan_dir(path, vertex.children[-1])
+
+
+def print_graph_fancy(root):
+    print("digraph G {")
+    root.dfs_print_fancy()
+    print("\tstart -> \"" + root.name + "\"")
+    print("\tstart [shape=Mdiamond];")
+    print("}")
 
 
 root = Vertex("Practice2", "../../Practice2", "dir")
 scan_dir("../../Practice2", root)
-root.dfs_print()
-root.dfs_print_fancy(0, True)
+print_graph_fancy(root)
