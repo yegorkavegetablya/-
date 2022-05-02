@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:/Users/egork/Desktop/Обучение/Институт/Питон/-/Homework/Practice3/tasks/task6.py", line 18, in <module>
+    run_with_log(func)
+  File "C:/Users/egork/Desktop/Обучение/Институт/Питон/-/Homework/Practice3/tasks/task6.py", line 7, in run_with_log
+    func()
+  File "C:/Users/egork/Desktop/Обучение/Институт/Питон/-/Homework/Practice3/tasks/task6.py", line 15, in func
+    print(b / a)
+ZeroDivisionError: division by zero

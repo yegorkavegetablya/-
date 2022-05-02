@@ -45,6 +45,6 @@ def print_graph_fancy(root):
     print("}")
 
 
-root = Vertex("Practice2", "../../Practice2", "dir")
-scan_dir("../../Practice2", root)
+root = Vertex("Practice1", "../../Practice1", "dir")
+scan_dir("../../Practice1", root)
 print_graph_fancy(root)
