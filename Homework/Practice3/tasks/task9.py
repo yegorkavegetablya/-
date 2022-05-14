@@ -86,7 +86,7 @@ class Person:
         return abs(new_x - self.x) + abs(new_y - self.y)
 
 
-model = SchellingModel(70, 10, 10, 0.5, 2, 10)
+model = SchellingModel(70, 10, 10, 0.5, 2, 20)
 model.createModel()
 plt.imshow(model.field)
 plt.show()

@@ -1,1 +1,2 @@
-# Какая-то дичь
+import testpackage
+
